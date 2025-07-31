@@ -3,8 +3,7 @@ services:
     image: dockurr/windows
     container_name: windows
     environment:
-      VERSION: "https://archive.org/download/windows-10-1507-home-and-pro/Win10_EnglishUS_x64.iso"
-      MANUAL: "Y"
+      VERSION: "10l"
     devices:
       - /dev/kvm
       - /dev/net/tun
