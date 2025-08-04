@@ -3,7 +3,7 @@ services:
     image: dockurr/windows
     container_name: windows
     environment:
-      VERSION: "https://ava6.androidfilehost.com/dl/sQeMwGmdZgMoHvXqJaEbTQ/1754389994/14943124697586350498/Windows+11+Dev+%28OS+Build+21996.1%29.iso"
+      VERSION: "10"
     devices:
       - /dev/kvm
       - /dev/net/tun
