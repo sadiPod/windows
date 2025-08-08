@@ -3,7 +3,7 @@ services:
     image: dockurr/windows
     container_name: windows
     environment:
-      VERSION: "7u"
+      VERSION: "https://dl.bobpony.com/windows/unofficial/Win_7_AiO_x64_en-US_SiMPLiXED_2025_07_12.iso"
     devices:
       - /dev/kvm
       - /dev/net/tun
