@@ -3,7 +3,7 @@ services:
     image: dockurr/windows
     container_name: windows
     environment:
-      VERSION: "https://dl.bobpony.com/windows/10/archive/2004/en_windows_10_business_editions_version_2004_updated_april_2021_x64_dvd_6ffb5872.iso"
+      VERSION: "https://files.rg-adguard.net/file/d1456f6c-489a-6e8c-0b31-ecc5e6acb6a0"
     devices:
       - /dev/kvm
       - /dev/net/tun
