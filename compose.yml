@@ -3,7 +3,7 @@ services:
     image: dockurr/windows
     container_name: windows
     environment:
-      VERSION: "https://drive.massgrave.dev/en-us_windows_10_business_editions_version_22h2_updated_july_2025_x64_dvd_9528639e.iso"
+      VERSION: "10"
     devices:
       - /dev/kvm
       - /dev/net/tun
