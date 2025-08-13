@@ -3,7 +3,7 @@ services:
     image: dockurr/windows
     container_name: windows
     environment:
-      VERSION: "https://archive.org/download/windows-7-sp1-aio-x64-fully-updated/en_windows_7_sp1_aio_updated_2020_x64.iso"
+      VERSION: "7"
     devices:
       - /dev/kvm
       - /dev/net/tun
