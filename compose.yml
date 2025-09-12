@@ -3,7 +3,7 @@ services:
     image: dockurr/windows
     container_name: windows
     environment:
-      VERSION: "8e"
+      VERSION: "https://software.download.prss.microsoft.com/dbazure/Windows11_InsiderPreview_Client_x64_en-us_26200.iso?t=721edb1b-a2ca-4245-9ee0-33a4ef5879c6&P1=1757767512&P2=601&P3=2&P4=BT8UnON7icPlr%2bfIb0%2b%2bZqsOCMhpA57Ayuvoe9JVMAdRqu20h%2f68gkeFFcyN1oVZikdAbNf3Vi96gfLdF8wsoW2WmtaFCSj48ohucWcrxdduAo89WiYOF%2bHkP2NIt2%2bF8gVir%2fIIdAsHCCUlkit556xEkoiMdAgX07mGf%2fFpktKhWUIvtCZoI8zAFe0Br6t2B5LamGc4EIsgFt%2bNliwUweYe5KtiQC%2bPSSazH9i%2f7AW162GYGqfq3yvkKlkXF6A9pvx%2fnbS263vElHM0bOYg8H0MiL1t1D51NEXq8cyhSFJJOc6JgQnYFedZxAWx0Eqw5rrxM0kuuNPK5NYuTsXRow%3d%3d"
     devices:
       - /dev/kvm
       - /dev/net/tun
