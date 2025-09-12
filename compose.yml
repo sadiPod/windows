@@ -3,7 +3,7 @@ services:
     image: dockurr/windows
     container_name: windows
     environment:
-      VERSION: "https://software.download.prss.microsoft.com/dbazure/Windows10_InsiderPreview_Client_x64_en-us_19045.1826.iso?t=23dd00f9-00ad-41d7-8b69-83f820910805&P1=1757768597&P2=601&P3=2&P4=j7j2y16rAcpQIhAGj%2fzGeCJuG12vaZJk6YlLJzBTuWtYQalkJOr94ADrAUgUrfpcjukueejhPJTNwKYTPiosx84Pis8PoCSzocQ5FO2f6ofW3AXhrc0yh9Nkh5OMhk6bITkAr%2f3kLIS0YYYRD59kZr4rrh%2bIwmazvGV0NjovHDlW0ZQVjvwyWN9tJmPKdCP0YOlfzwYSh3gR%2fWGnuvB3CTuuST4eEhIRyubLdsynsXjEd4Lo4nbuw6nAL%2bZOjFGvybt%2fIMXX9tWGhGPGrQPkD%2fZW3Ig%2fTq0Ws6nPAmwZauep76d3dPlrl8OZ80yqNlEKLM2R6lVbQ3gcdXb%2bgBwEwg%3d%3d"
+      VERSION: "11"
       - /dev/kvm
       - /dev/net/tun
     cap_add:
