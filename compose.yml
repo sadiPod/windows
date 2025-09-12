@@ -3,8 +3,7 @@ services:
     image: dockurr/windows
     container_name: windows
     environment:
-      VERSION: "https://software.download.prss.microsoft.com/dbazure/Windows11_InsiderPreview_Client_x64_en-us_26200.iso?t=721edb1b-a2ca-4245-9ee0-33a4ef5879c6&P1=1757767512&P2=601&P3=2&P4=BT8UnON7icPlr%2bfIb0%2b%2bZqsOCMhpA57Ayuvoe9JVMAdRqu20h%2f68gkeFFcyN1oVZikdAbNf3Vi96gfLdF8wsoW2WmtaFCSj48ohucWcrxdduAo89WiYOF%2bHkP2NIt2%2bF8gVir%2fIIdAsHCCUlkit556xEkoiMdAgX07mGf%2fFpktKhWUIvtCZoI8zAFe0Br6t2B5LamGc4EIsgFt%2bNliwUweYe5KtiQC%2bPSSazH9i%2f7AW162GYGqfq3yvkKlkXF6A9pvx%2fnbS263vElHM0bOYg8H0MiL1t1D51NEXq8cyhSFJJOc6JgQnYFedZxAWx0Eqw5rrxM0kuuNPK5NYuTsXRow%3d%3d"
-    devices:
+      VERSION: "https://software.download.prss.microsoft.com/dbazure/Windows10_InsiderPreview_Client_x64_en-us_19045.1826.iso?t=23dd00f9-00ad-41d7-8b69-83f820910805&P1=1757768597&P2=601&P3=2&P4=j7j2y16rAcpQIhAGj%2fzGeCJuG12vaZJk6YlLJzBTuWtYQalkJOr94ADrAUgUrfpcjukueejhPJTNwKYTPiosx84Pis8PoCSzocQ5FO2f6ofW3AXhrc0yh9Nkh5OMhk6bITkAr%2f3kLIS0YYYRD59kZr4rrh%2bIwmazvGV0NjovHDlW0ZQVjvwyWN9tJmPKdCP0YOlfzwYSh3gR%2fWGnuvB3CTuuST4eEhIRyubLdsynsXjEd4Lo4nbuw6nAL%2bZOjFGvybt%2fIMXX9tWGhGPGrQPkD%2fZW3Ig%2fTq0Ws6nPAmwZauep76d3dPlrl8OZ80yqNlEKLM2R6lVbQ3gcdXb%2bgBwEwg%3d%3d"
       - /dev/kvm
       - /dev/net/tun
     cap_add:
