@@ -93,9 +93,9 @@ kubectl apply -f https://raw.githubusercontent.com/dockur/windows/refs/heads/mas
   
   | **Value** | **Version**            | **Size** |
   |---|---|---|
-  | `11`   | Windows 11 Pro            | 5.4 GB   |
+  | `11`   | Windows 11 Pro            | 7.2 GB   |
   | `11l`  | Windows 11 LTSC           | 4.7 GB   |
-  | `11e`  | Windows 11 Enterprise     | 4.0 GB   |
+  | `11e`  | Windows 11 Enterprise     | 6.6 GB   |
   ||||
   | `10`   | Windows 10 Pro            | 5.7 GB   |
   | `10l`  | Windows 10 LTSC           | 4.6 GB   |
@@ -107,8 +107,8 @@ kubectl apply -f https://raw.githubusercontent.com/dockur/windows/refs/heads/mas
   | `xp`   | Windows XP Professional   | 0.6 GB   |
   | `2k`   | Windows 2000 Professional | 0.4 GB   | 
   ||||  
-  | `2025` | Windows Server 2025       | 5.6 GB   |
-  | `2022` | Windows Server 2022       | 4.7 GB   |
+  | `2025` | Windows Server 2025       | 6.7 GB   |
+  | `2022` | Windows Server 2022       | 6.0 GB   |
   | `2019` | Windows Server 2019       | 5.3 GB   |
   | `2016` | Windows Server 2016       | 6.5 GB   |
   | `2012` | Windows Server 2012       | 4.3 GB   |
@@ -139,7 +139,7 @@ kubectl apply -f https://raw.githubusercontent.com/dockur/windows/refs/heads/mas
   ```
   
 > [!TIP]
-> This can also be used to resize the existing disk to a larger capacity without any data loss.
+> This can also be used to resize the existing disk to a larger capacity without any data loss. However you will need to [manually extend the disk partition](https://learn.microsoft.com/en-us/windows-server/storage/disk-management/extend-a-basic-volume?tabs=disk-management) since the added disk space will appear as unallocated.
 
 ### How do I share files with the host?
 
@@ -392,9 +392,6 @@ kubectl apply -f https://raw.githubusercontent.com/dockur/windows/refs/heads/mas
 ### Is this project legal?
 
   Yes, this project contains only open-source code and does not distribute any copyrighted material. Any product keys found in the code are just generic placeholders provided by Microsoft for trial purposes. So under all applicable laws, this project will be considered legal.
-
-## Stars 🌟
-[![Stars](https://starchart.cc/dockur/windows.svg?variant=adaptive)](https://starchart.cc/dockur/windows)
 
 ## Disclaimer ⚖️
 

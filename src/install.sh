@@ -1,11 +1,51 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-TMP="$STORAGE/tmp"
-DIR="$TMP/unpack"
-FB="falling back to manual installation!"
 ETFS="boot/etfsboot.com"
+FB="falling back to manual installation!"
 EFISYS="efi/microsoft/boot/efisys_noprompt.bin"
+
+backup () {
+
+  local count=1
+  local iso="$1"
+  local name="unknown"
+  local root="$STORAGE/backups"
+  local previous="$STORAGE/windows.base"
+
+  if [ -f "$previous" ]; then
+
+    previous=$(<"$previous")
+    previous="${previous//[![:print:]]/}"
+
+    [ -n "$previous" ] && name="${previous%.*}"
+
+  fi
+
+  mkdir -p "$root"
+  local folder="$name"
+  local dir="$root/$folder"
+
+  while [ -d "$dir" ]
+  do
+    count=$((count+1))
+    folder="${name}.${count}"
+    dir="$root/$folder"
+  done
+
+  rm -rf "$dir"
+  mkdir -p "$dir"
+
+  [ -f "$iso" ] && mv -f "$iso" "$dir/"
+  find "$STORAGE" -maxdepth 1 -type f -iname 'data.*' -not -iname '*.iso' -exec mv -n {} "$dir/" \;
+  find "$STORAGE" -maxdepth 1 -type f -iname 'windows.*' -not -iname '*.iso' -exec mv -n {} "$dir/" \;
+  find "$STORAGE" -maxdepth 1 -type f \( -iname '*.rom' -or -iname '*.vars' \) -exec mv -n {} "$dir/" \;
+
+  [ -z "$(ls -A "$dir")" ] && rm -rf "$dir"
+  [ -z "$(ls -A "$root")" ] && rm -rf "$root"
+
+  return 0
+}
 
 skipInstall() {
 
@@ -16,28 +56,44 @@ skipInstall() {
   local previous="$STORAGE/windows.base"
 
   if [ -f "$previous" ]; then
+
     previous=$(<"$previous")
     previous="${previous//[![:print:]]/}"
+
     if [ -n "$previous" ]; then
       if [[ "${STORAGE,,}/${previous,,}" != "${iso,,}" ]]; then
-        if [ -f "$boot" ] && hasDisk; then
-          if [[ "${iso,,}" == "${STORAGE,,}/windows."* ]]; then
-            method="your custom .iso file"
-          else
-            if [[ "${previous,,}" != "windows."* ]]; then
-              method="the VERSION variable"
-            fi
-          fi
-          if [ -n "$method" ]; then
-            info "Detected that $method was changed, but ignoring this because Windows is already installed."
-            info "Please start with an empty /storage folder, if you want to install a different version of Windows."
-          fi
-          return 0
+
+        if ! hasDisk; then
+
+          rm -f "$STORAGE/$previous"
+          return 1
+
         fi
-        rm -f "$STORAGE/$previous"
+
+        if [[ "${iso,,}" == "${STORAGE,,}/windows."* ]]; then
+          method="your custom .iso file was changed"
+        else
+          if [[ "${previous,,}" != "windows."* ]]; then
+            method="the VERSION variable was changed"
+          else
+            method="your custom .iso file was removed"
+
+            if [ -f "$boot" ]; then
+              info "Detected that $method, will be ignored."
+              return 0
+            fi
+
+          fi
+        fi
+
+        info "Detected that $method, a backup of your previous installation will be saved..."
+        ! backup "$STORAGE/$previous" && error "Backup failed!"
+
         return 1
+
       fi
     fi
+
   fi
 
   [ -f "$boot" ] && hasDisk && return 0
@@ -51,8 +107,10 @@ skipInstall() {
   byte="16" && [[ "$MANUAL" == [Yy1]* ]] && byte="17"
 
   if [[ "$magic" != "$byte" ]]; then
+
     info "The ISO will be processed again because the configuration was changed..."
     return 1
+
   fi
 
   return 0
@@ -88,9 +146,15 @@ startInstall() {
 
   fi
 
+  TMP="$STORAGE/tmp"
+  rm -rf "$TMP"
+
   skipInstall "$BOOT" && return 1
 
-  rm -rf "$TMP"
+  if hasDisk; then
+    ! backup "" && error "Backup failed!"
+  fi
+
   mkdir -p "$TMP"
 
   if [ -z "$CUSTOM" ]; then
@@ -105,6 +169,11 @@ startInstall() {
   fi
 
   rm -f "$BOOT"
+
+  find "$STORAGE" -maxdepth 1 -type f -iname 'data.*' -not -iname '*.iso' -delete
+  find "$STORAGE" -maxdepth 1 -type f -iname 'windows.*' -not -iname '*.iso' -delete
+  find "$STORAGE" -maxdepth 1 -type f \( -iname '*.rom' -or -iname '*.vars' \) -delete
+
   return 0
 }
 
@@ -126,16 +195,6 @@ finishInstall() {
     fi
   fi
 
-  rm -f "$STORAGE/windows.old"
-  rm -f "$STORAGE/windows.vga"
-  rm -f "$STORAGE/windows.net"
-  rm -f "$STORAGE/windows.usb"
-  rm -f "$STORAGE/windows.args"
-  rm -f "$STORAGE/windows.base"
-  rm -f "$STORAGE/windows.boot"
-  rm -f "$STORAGE/windows.mode"
-  rm -f "$STORAGE/windows.type"
-
   cp -f /run/version "$STORAGE/windows.ver"
 
   if [[ "$iso" == "$STORAGE/"* ]]; then
@@ -153,7 +212,7 @@ finishInstall() {
       fi
     else
       # Enable secure boot + TPM on manual installs as Win11 requires
-      if [[ "$MANUAL" == [Yy1]* ]] || [[ "$aborted" == [Yy1]* ]]; then
+      if [[ "$MANUAL" == [Yy1]* || "$aborted" == [Yy1]* ]]; then
         if [[ "${DETECTED,,}" == "win11"* ]]; then
           BOOT_MODE="windows_secure"
           echo "$BOOT_MODE" > "$STORAGE/windows.mode"
@@ -302,6 +361,10 @@ extractESD() {
 
   local esdImageCount
   esdImageCount=$(wimlib-imagex info "$iso" | awk '/Image Count:/ {print $3}')
+
+  if [ -z "$esdImageCount" ]; then
+    error "Cannot read the image count in ESD file!" && return 1
+  fi
 
   wimlib-imagex apply "$iso" 1 "$dir" --quiet 2>/dev/null || {
     retVal=$?
@@ -608,14 +671,13 @@ detectImage() {
     warn "failed to locate 'sources' folder in ISO image, $FB" && return 1
   fi
 
-  wim=$(find "$src" -maxdepth 1 -type f -iname install.wim -print -quit)
-  [ ! -f "$wim" ] && wim=$(find "$src" -maxdepth 1 -type f -iname install.esd -print -quit)
+  wim=$(find "$src" -maxdepth 1 -type f \( -iname install.wim -or -iname install.esd \) -print -quit)
 
   if [ ! -f "$wim" ]; then
     warn "failed to locate 'install.wim' or 'install.esd' in ISO image, $FB" && return 1
   fi
 
-  info=$(wimlib-imagex info -xml "$wim" | tr -d '\000')
+  info=$(wimlib-imagex info -xml "$wim" | iconv -f UTF-16LE -t UTF-8)
   checkPlatform "$info" || exit 67
 
   DETECTED=$(detectVersion "$info")
@@ -634,7 +696,7 @@ detectImage() {
   desc=$(printEdition "$DETECTED" "$DETECTED")
   detectLanguage "$info"
 
-  if [[ "${LANGUAGE,,}" != "en" ]] && [[ "${LANGUAGE,,}" != "en-"* ]]; then
+  if [[ "${LANGUAGE,,}" != "en" && "${LANGUAGE,,}" != "en-"* ]]; then
     language=$(getLanguage "$LANGUAGE" "desc")
     desc+=" ($language)"
   fi
@@ -642,7 +704,7 @@ detectImage() {
   info "Detected: $desc"
   setXML "" && return 0
 
-  if [[ "$DETECTED" == "win81x86"* ]] || [[ "$DETECTED" == "win10x86"* ]]; then
+  if [[ "$DETECTED" == "win81x86"* || "$DETECTED" == "win10x86"* ]]; then
     error "The 32-bit version of $desc is not supported!" && return 1
   fi
 
@@ -728,6 +790,7 @@ updateXML() {
   user=$(echo "$USERNAME" | sed 's/[^[:alnum:]@!._-]//g')
 
   if [ -n "$user" ]; then
+    sed -i "s/-name \"Docker\"/-name \"$user\"/g" "$asset"
     sed -i "s/<Name>Docker<\/Name>/<Name>$user<\/Name>/g" "$asset"
     sed -i "s/where name=\"Docker\"/where name=\"$user\"/g" "$asset"
     sed -i "s/<FullName>Docker<\/FullName>/<FullName>$user<\/FullName>/g" "$asset"
@@ -909,15 +972,14 @@ updateImage() {
     error "failed to locate 'sources' folder in ISO image, $FB" && return 1
   fi
 
-  wim=$(find "$src" -maxdepth 1 -type f -iname boot.wim -print -quit)
-  [ ! -f "$wim" ] && wim=$(find "$src" -maxdepth 1 -type f -iname boot.esd -print -quit)
+  wim=$(find "$src" -maxdepth 1 -type f \( -iname boot.wim -or -iname boot.esd \) -print -quit)
 
   if [ ! -f "$wim" ]; then
     error "failed to locate 'boot.wim' or 'boot.esd' in ISO image, $FB" && return 1
   fi
 
   index="1"
-  result=$(wimlib-imagex info -xml "$wim" | tr -d '\000')
+  result=$(wimlib-imagex info -xml "$wim" | iconv -f UTF-16LE -t UTF-8)
 
   if [[ "${result^^}" == *"<IMAGE INDEX=\"2\">"* ]]; then
     index="2"
@@ -1072,8 +1134,6 @@ buildImage() {
 
 bootWindows() {
 
-  rm -rf "$TMP"
-
   if [ -f "$STORAGE/windows.args" ]; then
     ARGS=$(<"$STORAGE/windows.args")
     ARGS="${ARGS//[![:print:]]/}"
@@ -1140,6 +1200,8 @@ if [ ! -s "$ISO" ] || [ ! -f "$ISO" ]; then
     exit 61
   fi
 fi
+
+DIR="$TMP/unpack"
 
 if ! extractImage "$ISO" "$DIR" "$VERSION"; then
   rm -f "$ISO" 2> /dev/null || true

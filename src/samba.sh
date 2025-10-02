@@ -18,6 +18,9 @@ if [[ "${NETWORK,,}" == "user"* ]]; then
   interface="127.0.0.1"
 fi
 
+html "Starting file sharing services..."
+[[ "$DEBUG" == [Yy1]* ]] && echo "Starting Samba daemon..."
+
 addShare() {
   local dir="$1"
   local name="$2"
@@ -111,10 +114,10 @@ for dir in "${dirs[@]}"; do
   addShare "$dir" "$dir_name" "Shared $dir_name" || error "Failed to create shared folder for $dir!"
 done
 
-# Fix Samba permissions
-[ -d /run/samba/msg.lock ] && chmod -R 0755 /run/samba/msg.lock
-[ -d /var/log/samba/cores ] && chmod -R 0700 /var/log/samba/cores
-[ -d /var/cache/samba/msg.lock ] && chmod -R 0755 /var/cache/samba/msg.lock
+# Try to fix  Samba permissions
+[ -d /run/samba/msg.lock ] && chmod -R 0755 /run/samba/msg.lock 2>/dev/null || :
+[ -d /var/log/samba/cores ] && chmod -R 0700 /var/log/samba/cores 2>/dev/null || :
+[ -d /var/cache/samba/msg.lock ] && chmod -R 0755 /var/cache/samba/msg.lock 2>/dev/null || :
 
 if ! smbd; then
   error "Samba daemon failed to start!"
@@ -123,14 +126,15 @@ fi
 
 if [[ "${BOOT_MODE:-}" == "windows_legacy" ]]; then
   # Enable NetBIOS on Windows 7 and lower
+  [[ "$DEBUG" == [Yy1]* ]] && echo "Starting NetBIOS daemon..."
   if ! nmbd; then
     error "NetBIOS daemon failed to start!"
     nmbd -i --debug-stdout || true
   fi
 else
   # Enable Web Service Discovery on Vista and up
-  wsdd -i "$interface" -p -n "$hostname" &
-  echo "$!" > /var/run/wsdd.pid
+  [[ "$DEBUG" == [Yy1]* ]] && echo "Starting Web Service Discovery daemon..."
+  wsddn -i "$interface" -H "$hostname" --pid-file=/var/run/wsdd.pid >/dev/null &
 fi
 
 return 0
