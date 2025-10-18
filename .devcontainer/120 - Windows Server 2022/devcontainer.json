@@ -1,0 +1,21 @@
+{
+  "name": "Windows Server 2022",
+  "service": "windows",
+  "containerEnv": {
+    "VERSION": "2022"
+  },  
+  "forwardPorts": [8006],  
+  "portsAttributes": {
+    "8006": {
+      "label": "Web",
+      "onAutoForward": "openBrowser"
+    }
+  },
+  "otherPortsAttributes": {
+    "onAutoForward": "silent"
+  }, 
+  "hostRequirements": {
+    "storage": "64gb"
+  },  
+  "dockerComposeFile": "../codespaces.yml"
+}

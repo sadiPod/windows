@@ -1,0 +1,21 @@
+{
+  "name": "Windows 8.1 Enterprise",
+  "service": "windows",
+  "containerEnv": {
+    "VERSION": "8e"
+  },  
+  "forwardPorts": [8006],  
+  "portsAttributes": {
+    "8006": {
+      "label": "Web",
+      "onAutoForward": "openBrowser"
+    }
+  },
+  "otherPortsAttributes": {
+    "onAutoForward": "silent"
+  }, 
+  "hostRequirements": {
+    "storage": "64gb"
+  },  
+  "dockerComposeFile": "../codespaces.yml"
+}

@@ -66,6 +66,10 @@ kubectl apply -f https://raw.githubusercontent.com/dockur/windows/refs/heads/mas
 
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/dockur/windows)
 
+##### Via a graphical installer:
+
+[![Download WinBoat](https://github.com/dockur/windows/raw/master/.github/winboat.png)](https://winboat.app)
+
 ## FAQ 💬
 
 ### How do I use it?
@@ -143,23 +147,20 @@ kubectl apply -f https://raw.githubusercontent.com/dockur/windows/refs/heads/mas
 
 ### How do I share files with the host?
 
-  Open 'File Explorer' and click on the 'Network' section, you will see a computer called `host.lan`.
+  After installation there will be a folder called `Shared` on your desktop, which can be used to exchange files with the host machine.
   
-  Double-click it and it will show a folder called `Data`, which can be bound to any folder on your host via the compose file:
+  To select a folder on the host for this purpose, include the following bind mount in your compose file:
 
   ```yaml
   volumes:
-    -  ./example:/data
+    -  ./example:/shared
   ```
 
-  The example folder `./example` will be available as ` \\host.lan\Data`.
-  
-> [!TIP]
-> You can map this path to a drive letter in Windows, for easier access.
+  Replace the example path `./example` with your desired shared folder, which then will become visible as `Shared`.
 
 ### How do I change the amount of CPU or RAM?
 
-  By default, the container will be allowed to use a maximum of 2 CPU cores and 4 GB of RAM.
+  By default, Windows will be allowed to use 2 CPU cores and 4 GB of RAM.
 
   If you want to adjust this, you can specify the desired amount using the following environment variables:
 
@@ -171,9 +172,9 @@ kubectl apply -f https://raw.githubusercontent.com/dockur/windows/refs/heads/mas
 
 ### How do I configure the username and password?
 
-  By default, a user called `Docker` is created during installation and its password is `admin`.
+  By default, a user called `Docker` is created and its password is `admin`.
 
-  If you want to use different credentials, you can configure them in your compose file (only before installation):
+  If you want to use different credentials during installation, you can configure them in your compose file:
 
   ```yaml
   environment:
@@ -185,7 +186,7 @@ kubectl apply -f https://raw.githubusercontent.com/dockur/windows/refs/heads/mas
 
   By default, the English version of Windows will be downloaded.
   
-  But before installation you can add the `LANGUAGE` environment variable to your compose file, in order to specify an alternative language:
+  But you can add the `LANGUAGE` environment variable to your compose file, in order to specify an alternative language to be downloaded:
 
   ```yaml
   environment:
@@ -196,21 +197,12 @@ kubectl apply -f https://raw.githubusercontent.com/dockur/windows/refs/heads/mas
 
 ### How do I select the keyboard layout?
 
-  If you want to use a keyboard layout or locale that is not the default for your selected language, you can add  `KEYBOARD` and `REGION` variables like this (before installation):
+  If you want to use a keyboard layout or locale that is not the default for your selected language, you can add  `KEYBOARD` and `REGION` variables like this:
 
   ```yaml
   environment:
     REGION: "en-US"
     KEYBOARD: "en-US"
-  ```
-
-### How do I select the edition?
-
-  Windows Server offers a minimalistic Core edition without a GUI. To select those non-standard editions, you can add a `EDITION` variable like this (before installation):
-
-  ```yaml
-  environment:
-    EDITION: "core"
   ```
 
 ### How do I install a custom image?

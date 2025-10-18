@@ -127,8 +127,9 @@ startInstall() {
     if [[ "${VERSION,,}" == "http"* ]]; then
 
       file=$(basename "${VERSION%%\?*}")
-      : "${file//+/ }"; printf -v file '%b' "${_//%/\\x}"
-      file=$(echo "$file" | sed -e 's/[^A-Za-z0-9._-]/_/g')
+      file="${file//+/ }"
+      printf -v file '%b' "${file//%/\\x}"
+      file="${file//[!A-Za-z0-9._-]/_}"
 
     else
 
@@ -755,13 +756,10 @@ updateXML() {
   local language="$2"
   local culture region user admin pass keyboard
 
-  if [ -n "${VM_NET_IP:-}" ]; then
-    sed -i "s/ 20.20.20.1 / ${VM_NET_IP%.*}.1 /g" "$asset"
-  fi
-
   [ -z "$HEIGHT" ] && HEIGHT="720"
   [ -z "$WIDTH" ] && WIDTH="1280"
 
+  sed -i "s/>Windows for Docker</>$APP for $ENGINE</g" "$asset"
   sed -i "s/<VerticalResolution>1080<\/VerticalResolution>/<VerticalResolution>$HEIGHT<\/VerticalResolution>/g" "$asset"
   sed -i "s/<HorizontalResolution>1920<\/HorizontalResolution>/<HorizontalResolution>$WIDTH<\/HorizontalResolution>/g" "$asset"
 

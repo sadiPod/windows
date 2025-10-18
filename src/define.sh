@@ -1584,9 +1584,6 @@ prepareInstall() {
   [ -n "$PASSWORD" ] && password=$(echo "$PASSWORD" | sed 's/"//g')
   [ -z "$password" ] && password="admin"
 
-  local ip="20.20.20.1"
-  [ -n "${VM_NET_IP:-}" ] && ip="${VM_NET_IP%.*}.1"
-
   find "$target" -maxdepth 1 -type f -iname winnt.sif -exec rm {} \;
 
   {       echo "[Data]"
@@ -1623,7 +1620,7 @@ prepareInstall() {
           echo "[UserData]"
           echo "    FullName=\"$username\""
           echo "    ComputerName=\"*\""
-          echo "    OrgName=\"Windows for Docker\""
+          echo "    OrgName=\"$APP for $ENGINE\""
           echo "    $KEY"
           echo ""
           echo "[Identification]"
@@ -1769,19 +1766,18 @@ prepareInstall() {
           echo ""
           echo "Call Domain.MoveHere(LocalAdminADsPath, \"$username\")"
           echo ""
-          echo "With (CreateObject(\"Scripting.FileSystemObject\"))"
-          echo "  SysRoot = WshShell.ExpandEnvironmentStrings(\"%SystemRoot%\")"
-          echo "  Set oFile = .OpenTextFile(SysRoot & \"\system32\drivers\etc\hosts\", 8, true)"
-          echo "  oFile.Write(\"$ip      host.lan\")"
-          echo "  oFile.Close()"
-          echo "  Set oFile = Nothing"
+          echo "Set oLink = WshShell.CreateShortcut(WshShell.ExpandEnvironmentStrings(\"%userprofile%\\Desktop\\Shared.lnk\"))"
+          echo "With oLink"
+          echo "  .TargetPath = \"\\\\host.lan\\Data\""
+          echo "  .Save"
           echo "End With"
+          echo "Set oLink = Nothing"
           echo ""
-  } | unix2dos > "$dir/\$OEM\$/admin.vbs"
+  } | unix2dos > "$dir/\$OEM\$/install.vbs"
 
   {       echo "[COMMANDS]"
           echo "\"REGEDIT /s install.reg\""
-          echo "\"Wscript admin.vbs\""
+          echo "\"Wscript install.vbs\""
           echo ""
   } | unix2dos > "$dir/\$OEM\$/cmdlines.txt"
 
